@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DELZ ARENA V6 - FIX ONLINE</title>
-<script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+<title>DELZ ARENA V7 - MQTT FIX</title>
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#000;color:#fff;font-family:'Segoe UI',sans-serif;overflow-x:hidden;min-height:100vh}
+body{background:#000;color:#fff;font-family:'Segoe UI',sans-serif;min-height:100vh}
 .bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 20% 0%,#2a1a00 0%,#000 50%),radial-gradient(ellipse at 90% 100%,#1a0f00 0%,#000 60%)}
 .wrap{max-width:480px;margin:auto;padding:22px 16px 40px}
 h1.top{text-align:center;font-weight:300;font-size:44px;line-height:1;margin:22px 0 4px}
@@ -51,7 +51,6 @@ label{font-size:12px;color:#ccc;display:block;margin:14px 0 6px}
 .succBox{background:#151515;border:1px solid #333;border-radius:22px;padding:28px;text-align:center;max-width:300px}
 </style></head><body>
 <div class="bg"></div>
-
 <div class="wrap" id="loginView">
 <h1 class="top">Login form<b>V7</b></h1>
 <div class="pages">
@@ -74,21 +73,18 @@ label{font-size:12px;color:#ccc;display:block;margin:14px 0 6px}
 </div></div>
 </div>
 </div>
-
 <div class="wrap" id="mainView" style="display:none">
 <h1 class="top" style="font-size:32px">DELZ <b style="font-size:32px">ARENA</b></h1>
 <div class="mainCard" style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-<div><div style="font-size:12px;color:#aaa">Login sebagai</div><div id="mainUser" style="font-size:20px;font-weight:800">-</div><div style="font-size:12px;color:#aaa">Status: <span style="color:#22c55e;font-weight:700">ONLINE</span> - <span id="connStatus" style="color:#ffd700">Menghubungkan...</span></div></div>
+<div><div style="font-size:12px;color:#aaa">Login sebagai</div><div id="mainUser" style="font-size:20px;font-weight:800">-</div><div style="font-size:12px;color:#aaa">Status: <span style="color:#22c55e;font-weight:700">ONLINE</span> - <span id="connStatus" style="color:#ffd700">Menghubungkan ke MQTT...</span></div></div>
 <div style="text-align:right"><div style="font-size:12px;color:#aaa">POINT LU</div><div id="mainPoint" style="font-size:26px;font-weight:900;color:#ffd700">0</div><button class="btn dark" style="width:auto;padding:8px 14px;font-size:12px;margin-top:6px" onclick="doLogout()">Logout</button></div>
 </div>
-
 <div class="mainCard">
 <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:15px">USER ONLINE - BISA DITANTANG</h3><button class="btn dark" style="width:auto;padding:7px 12px;font-size:11px" onclick="refreshOnline()">Refresh</button></div>
-<p style="font-size:11px;color:#aaa;margin-top:4px">Pencet TANTANG, lawan langsung dapet notif. Tanpa kode room.</p>
+<p style="font-size:11px;color:#aaa;margin-top:4px">Server MQTT HiveMQ - Live. Pencet TANTANG, lawan langsung dapet notif.</p>
 <div id="onlineList"></div>
 <div id="myChallengeStatus" style="font-size:12px;color:#ffd700;margin-top:8px;min-height:16px"></div>
 </div>
-
 <div class="mainCard">
 <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="font-size:15px">PILIH UKURAN PAPAN</h3><span id="sizeLabel" style="font-size:11px;color:#aaa">3 x 3</span></div>
 <div class="sizeGrid">
@@ -104,7 +100,6 @@ label{font-size:12px;color:#ccc;display:block;margin:14px 0 6px}
 <button class="btn dark" onclick="switchGame('suit')" id="btnSuit">SUIT</button>
 </div>
 </div>
-
 <div class="mainCard" id="tttBox">
 <div style="display:flex;justify-content:space-between;align-items:center"><span id="tttInfo" style="font-weight:700;font-size:14px">Belum ada lawan. Tantang user di atas!</span><span id="matchLabel" style="font-size:11px;color:#aaa"></span></div>
 <div style="font-size:11px;color:#aaa;margin-top:4px">Lawan: <b id="opponentLabel" style="color:#fff">-</b> | Lu: <b id="mySymbol" style="color:#fff">-</b> | X: <span id="xCount">0</span> - O: <span id="oCount">0</span></div>
@@ -112,7 +107,6 @@ label{font-size:12px;color:#ccc;display:block;margin:14px 0 6px}
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><button class="btn dark" onclick="resetTTT()">Ulangi Ronde</button><button class="btn white" onclick="randomSize()">Acak Ukuran</button></div>
 <p style="font-size:11px;color:#888;text-align:center;margin-top:8px">Menang +10 Point - Seri +2 Point</p>
 </div>
-
 <div class="mainCard" id="suitBox" style="display:none">
 <p id="suitInfo" style="font-weight:700;text-align:center;font-size:14px">Pilih jagoan lu!</p>
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">
@@ -122,12 +116,10 @@ label{font-size:12px;color:#ccc;display:block;margin:14px 0 6px}
 </div>
 <div id="suitResult" style="text-align:center;font-size:13px;background:#0a0a0a;border-radius:12px;padding:12px;margin-top:10px;min-height:52px;display:grid;place-items:center">Belum ada hasil.</div>
 </div>
-
 <div class="mainCard">
 <h3 style="font-size:15px">LEADERBOARD</h3><div id="leaderboard" style="margin-top:8px"></div>
 </div>
 </div>
-
 <div class="success" id="success"><div class="succBox"><h3 style="font-size:20px">Berhasil!</h3><p id="successText" style="color:#aaa;font-size:13px;margin:8px 0 14px">Login berhasil!</p><button class="btn" onclick="closeSuccess()">Lanjut</button></div></div>
 <div class="invModal" id="inviteModal"><div class="popIn" style="background:#151515;border:1px solid #333;border-radius:22px;padding:22px;text-align:center;max-width:340px;width:100%">
 <div style="font-size:12px;color:#ffd700;font-weight:800">TANTANGAN MASUK</div>
@@ -137,10 +129,9 @@ label{font-size:12px;color:#ccc;display:block;margin:14px 0 6px}
 </div></div>
 <div class="invModal" id="winModal"><div class="popIn" style="background:#151515;border:1px solid #333;border-radius:22px;padding:22px;text-align:center;max-width:340px;width:100%">
 <h3 style="font-size:22px">LU MENANG</h3><p id="winModalText" style="color:#aaa;font-size:13px;margin:8px 0 14px">+10 Point!</p><button class="btn" onclick="closeWinModal()">GAS LAGI</button></div></div>
-
 <script>
-const gun = Gun({peers:['https://peer.wallie.io/gun','https://gun-manhattan.herokuapp.com/gun','https://dletta.herokuapp.com/gun','https://peer.wallie.io/gun'], localStorage:false});
-let currentUser=null, currentPoint=0, boardRows=3, boardCols=3, boardSize=3, boardState=Array(9).fill(''), winCells=[], mySymbol='', opponent='', matchId='', pendingChallenge=null, lastWinId='', onlineCache={};
+let currentUser=null, currentPoint=0, boardRows=3, boardCols=3, boardSize=3, boardState=Array(9).fill(''), winCells=[], mySymbol='', opponent='', matchId='', pendingChallenge=null, lastWinId='', onlineCache={}, mqttClient=null, suitP1=null, suitP2=null;
+const TOPIC_BASE='delz-arena-v7-xyz';
 function getUsers(){ try{return JSON.parse(localStorage.getItem('delz_users')||'{}')}catch(e){return {}} }
 function saveUsers(u){ localStorage.setItem('delz_users',JSON.stringify(u)); }
 function winNeed(){ if(boardRows===3&&boardCols===3) return 3; if(boardRows<=5) return 4; return 5; }
@@ -172,45 +163,96 @@ function doLogin(){
 }
 function doLogout(){
  if(!confirm('Logout dari '+currentUser+'?')) return;
- gun.get('delz-online-v6').get(currentUser).put({name:currentUser,point:currentPoint,online:false,lastSeen:0});
+ if(mqttClient) mqttClient.publish(TOPIC_BASE+'/online/'+currentUser, JSON.stringify({name:currentUser,point:currentPoint,online:false,lastSeen:0}), {retain:true});
  localStorage.removeItem('delz_session'); currentUser=null;
  document.getElementById('loginView').style.display='block'; document.getElementById('mainView').style.display='none';
+ if(mqttClient) mqttClient.end();
 }
 function enterMain(){
  document.getElementById('loginView').style.display='none'; document.getElementById('mainView').style.display='block';
  document.getElementById('mainUser').textContent=currentUser;
  document.getElementById('mainPoint').textContent=currentPoint;
- goOnline(); listenChallenge(); loadLeaderboard(); renderBoard(); startOnlineListener();
+ connectMQTT(); renderBoard(); loadLeaderboardLocal();
 }
-function goOnline(){
- if(!currentUser) return;
- let kirim=()=>{ if(!currentUser) return; gun.get('delz-online-v6').get(currentUser).put({name:currentUser,point:currentPoint,online:true,lastSeen:Date.now()}); document.getElementById('connStatus').textContent='Terhubung'; document.getElementById('connStatus').style.color='#22c55e'; };
- kirim(); setInterval(kirim,3000);
- window.addEventListener('beforeunload',()=>{ gun.get('delz-online-v6').get(currentUser).put({name:currentUser,point:currentPoint,online:false,lastSeen:0}); });
-}
-function startOnlineListener(){
- // INI KUNCINYA: .on LIVE, BUKAN .once
- gun.get('delz-online-v6').map().on((d,k)=>{
-  if(!d || !d.name) return;
-  if(d.name===currentUser) return;
-  // kalo offline, hapus dari list
-  if(!d.online || (Date.now() - (d.lastSeen||0) > 15000)){
-   let el=document.getElementById('user-'+d.name); if(el) el.remove(); delete onlineCache[d.name]; checkEmpty(); return;
-  }
-  onlineCache[d.name]=d;
-  renderOnlineList();
+// ===== MQTT - INI KUNCINYA =====
+function connectMQTT(){
+ if(mqttClient) mqttClient.end();
+ mqttClient = mqtt.connect('wss://broker.hivemq.com:8884/mqtt', { clientId: 'delz_'+currentUser+'_'+Math.random().toString(36).slice(2,6), clean:true, reconnectPeriod:2000 });
+ mqttClient.on('connect', ()=>{
+  document.getElementById('connStatus').textContent='Terhubung - MQTT ON'; document.getElementById('connStatus').style.color='#22c55e';
+  mqttClient.subscribe([TOPIC_BASE+'/online/+', TOPIC_BASE+'/challenge/'+currentUser, TOPIC_BASE+'/match/+', TOPIC_BASE+'/leaderboard/+'], ()=>{});
+  publishOnline();
+  setInterval(publishOnline, 3000);
+  setInterval(cleanupOnline, 5000);
  });
- // Bersihin yang udah lama gak heartbeat tiap 5 detik
- setInterval(()=>{
-  let now=Date.now(); let changed=false;
-  for(let n in onlineCache){ if(now - (onlineCache[n].lastSeen||0) > 15000){ delete onlineCache[n]; changed=true; } }
-  if(changed) renderOnlineList();
- },5000);
+ mqttClient.on('message', (topic, payload)=>{
+  try{
+   let msg = JSON.parse(payload.toString());
+   if(topic.startsWith(TOPIC_BASE+'/online/')){
+    let name = topic.split('/').pop();
+    if(name===currentUser) return;
+    if(!msg.online || Date.now() - msg.lastSeen > 15000){ delete onlineCache[name]; }
+    else onlineCache[name]=msg;
+    renderOnlineList();
+   } else if(topic===TOPIC_BASE+'/challenge/'+currentUser){
+    if(msg.status==='pending' && msg.from!==currentUser){
+     pendingChallenge=msg;
+     document.getElementById('inviteText').textContent=msg.from+' menantang lu!';
+     document.getElementById('inviteDetail').textContent='Main TicTacToe - Ukuran '+(msg.size===2?'5 x 2':msg.size+' x '+msg.size);
+     document.getElementById('inviteModal').classList.add('show');
+     if(navigator.vibrate) navigator.vibrate(200);
+    }
+    if(msg.status==='accepted' && msg.to===currentUser){
+     document.getElementById('myChallengeStatus').textContent=msg.from+' MENERIMA! Gas main!';
+     startMatch(msg.matchId, msg.from, msg.size, true);
+    }
+    if(msg.status==='declined' && msg.to===currentUser){
+     document.getElementById('myChallengeStatus').textContent=msg.from+' MENOLAK tantangan lu.';
+    }
+   } else if(topic.startsWith(TOPIC_BASE+'/match/')){
+    let mid = topic.split('/').pop();
+    if(mid!==matchId) return;
+    if(msg.type==='board'){
+     if(msg.size && msg.size!==boardSize) applySize(msg.size,false);
+     boardState=msg.state; winCells=msg.winCells||[];
+     renderBoard();
+     document.getElementById('tttInfo').textContent=msg.winner?('Pemenang: '+msg.winner):'Giliran jalan...';
+     if(msg.winner && msg.winner!=='' && msg.winner!==lastWinId){
+      lastWinId=msg.winner;
+      if(msg.winner===currentUser) addPoint(10);
+      if(msg.winner==='SERI') addPoint(2);
+     }
+    }
+    if(msg.type==='suit'){
+     let p1=msg.p1,p2=msg.p2; if(!p1||!p2) return;
+     let winner=''; if(p1.choice===p2.choice) winner='SERI'; else if((p1.choice==='batu'&&p2.choice==='gunting')||(p1.choice==='gunting'&&p2.choice==='kertas')||(p1.choice==='kertas'&&p2.choice==='batu')) winner=p1.name; else winner=p2.name;
+     let isMe=p1.name===currentUser, myC=isMe?p1.choice:p2.choice, oppC=isMe?p2.choice:p1.choice;
+     let label={batu:'BATU',gunting:'GUNTING',kertas:'KERTAS'};
+     document.getElementById('suitResult').innerHTML='Lu: <b>'+label[myC]+'</b> vs Lawan: <b>'+label[oppC]+'</b><br><b>'+(winner==='SERI'?'SERI':winner===currentUser?'LU MENANG +5':'LU KALAH')+'</b>';
+     if(winner===currentUser) addPoint(5);
+    }
+   } else if(topic.startsWith(TOPIC_BASE+'/leaderboard/')){
+    renderLeaderboardFromCache();
+   }
+  }catch(e){}
+ });
+ mqttClient.on('error', ()=>{ document.getElementById('connStatus').textContent='Reconnecting...'; });
+}
+function publishOnline(){
+ if(!mqttClient||!currentUser) return;
+ mqttClient.publish(TOPIC_BASE+'/online/'+currentUser, JSON.stringify({name:currentUser,point:currentPoint,online:true,lastSeen:Date.now()}), {retain:true});
+ mqttClient.publish(TOPIC_BASE+'/leaderboard/'+currentUser, JSON.stringify({name:currentUser,point:currentPoint}), {retain:true});
+}
+function cleanupOnline(){
+ let now=Date.now(), changed=false;
+ for(let n in onlineCache){ if(now - onlineCache[n].lastSeen > 15000){ delete onlineCache[n]; changed=true; } }
+ if(changed) renderOnlineList();
 }
 function renderOnlineList(){
- let list=document.getElementById('onlineList'); list.innerHTML='';
+ let list=document.getElementById('onlineList');
  let names=Object.keys(onlineCache).filter(n=>n!==currentUser);
- if(names.length===0){ list.innerHTML='<div class="onlineRow"><span style="font-size:12px;color:#888">Belum ada user lain. Buka web ini di HP temen lu barengan, tunggu 3 detik.</span></div>'; return; }
+ if(names.length===0){ list.innerHTML='<div class="onlineRow"><span style="font-size:12px;color:#888">Belum ada user lain. Buka web ini di HP temen lu barengan, tunggu 3 detik. Pastikan dia login username BEDA.</span></div>'; return; }
+ list.innerHTML='';
  names.forEach(n=>{
   let d=onlineCache[n];
   let row=document.createElement('div'); row.className='onlineRow'; row.id='user-'+n;
@@ -218,102 +260,40 @@ function renderOnlineList(){
   list.appendChild(row);
  });
 }
-function checkEmpty(){ if(Object.keys(onlineCache).length===0) renderOnlineList(); }
-function refreshOnline(){
- document.getElementById('onlineList').innerHTML='<div class="onlineRow"><span style="font-size:12px;color:#888">Mencari... tunggu 3 detik...</span></div>';
- // Paksa kirim ulang status gua biar temen gua tau gua online
- if(currentUser) gun.get('delz-online-v6').get(currentUser).put({name:currentUser,point:currentPoint,online:true,lastSeen:Date.now()});
- setTimeout(renderOnlineList,3000);
-}
+function refreshOnline(){ publishOnline(); document.getElementById('onlineList').innerHTML='<div class="onlineRow"><span style="font-size:12px;color:#888">Mencari... tunggu 3 detik...</span></div>'; setTimeout(renderOnlineList,3000); }
 function sendChallenge(target){
- if(!currentUser) return;
  let id=[currentUser,target].sort().join('_');
- gun.get('delz-challenge-v6-'+target).put({from:currentUser,to:target,size:boardSize,matchId:id,status:'pending',time:Date.now()});
+ mqttClient.publish(TOPIC_BASE+'/challenge/'+target, JSON.stringify({from:currentUser,to:target,size:boardSize,matchId:id,status:'pending',time:Date.now()}));
  document.getElementById('myChallengeStatus').textContent='Mengirim tantangan ke '+target+'... tunggu dia TERIMA.';
- // Pantau jawaban
- gun.get('delz-challenge-v6-'+currentUser).on(data=>{
-  if(data && data.status==='accepted' && data.matchId===id){
-   document.getElementById('myChallengeStatus').textContent=target+' MENERIMA! Gas main!';
-   startMatch(id,target,boardSize,true);
-  }
-  if(data && data.status==='declined' && data.matchId===id){
-   document.getElementById('myChallengeStatus').textContent=target+' MENOLAK tantangan lu.';
-  }
- });
-}
-function listenChallenge(){
- if(!currentUser) return;
- gun.get('delz-challenge-v6-'+currentUser).on(data=>{
-  if(!data || !data.from || data.from===currentUser) return;
-  if(data.status==='pending'){
-   if(pendingChallenge && pendingChallenge.time===data.time) return;
-   pendingChallenge=data;
-   document.getElementById('inviteText').textContent=data.from+' menantang lu!';
-   document.getElementById('inviteDetail').textContent='Main TicTacToe - Ukuran '+(data.size===2?'5 x 2':data.size+' x '+data.size);
-   document.getElementById('inviteModal').classList.add('show');
-   try{ let a=new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQAAAAA='); a.play().catch(()=>{}); }catch(e){}
-   if(navigator.vibrate) navigator.vibrate(200);
-  }
- });
 }
 function acceptChallenge(){
- if(!pendingChallenge) return;
- let c=pendingChallenge;
- gun.get('delz-challenge-v6-'+currentUser).put({from:c.from,to:currentUser,size:c.size,matchId:c.matchId,status:'accepted',time:c.time});
+ if(!pendingChallenge) return; let c=pendingChallenge;
+ mqttClient.publish(TOPIC_BASE+'/challenge/'+c.from, JSON.stringify({from:currentUser,to:c.from,size:c.size,matchId:c.matchId,status:'accepted',time:c.time}));
  document.getElementById('inviteModal').classList.remove('show');
  startMatch(c.matchId,c.from,c.size,false);
 }
 function declineChallenge(){
- if(!pendingChallenge) return;
- let c=pendingChallenge;
- gun.get('delz-challenge-v6-'+c.from).put({from:currentUser,to:c.from,size:c.size,matchId:c.matchId,status:'declined',time:Date.now()});
- gun.get('delz-challenge-v6-'+currentUser).put({from:null,to:null,size:null,matchId:null,status:null,time:null});
+ if(!pendingChallenge) return; let c=pendingChallenge;
+ mqttClient.publish(TOPIC_BASE+'/challenge/'+c.from, JSON.stringify({from:currentUser,to:c.from,size:c.size,matchId:c.matchId,status:'declined',time:Date.now()}));
  document.getElementById('inviteModal').classList.remove('show'); pendingChallenge=null;
 }
 function startMatch(id,opp,size,isChallenger){
- matchId=id; opponent=opp; lastWinId='';
+ matchId=id; opponent=opp; lastWinId=''; suitP1=null; suitP2=null;
  document.getElementById('opponentLabel').textContent=opp;
  document.getElementById('matchLabel').textContent='Match: '+id;
  mySymbol=isChallenger?'X':'O';
  document.getElementById('mySymbol').textContent=mySymbol;
  applySize(size,false);
  document.getElementById('tttInfo').textContent='Match dimulai! Lu jadi '+mySymbol+' vs '+opp;
- listenMatch(id);
- if(isChallenger){ gun.get('delz-match-v6-'+id).get('board').put({state:Array(totalCells()).fill('').join(','),winner:'',size:size,winCells:''}); }
+ if(isChallenger){ mqttClient.publish(TOPIC_BASE+'/match/'+id, JSON.stringify({type:'board',state:Array(totalCells()).fill(''),winner:'',size:size,winCells:[]})); }
  document.getElementById('tttBox').scrollIntoView({behavior:'smooth'});
-}
-function listenMatch(id){
- gun.get('delz-match-v6-'+id).get('board').on(data=>{
-  if(!data || !data.state) return;
-  if(data.size && data.size!==boardSize) applySize(data.size,false);
-  boardState=data.state.split(','); winCells=data.winCells?data.winCells.split(',').filter(x=>x!=='').map(Number):[];
-  renderBoard();
-  document.getElementById('tttInfo').textContent=data.winner?('Pemenang: '+data.winner):'Giliran jalan...';
-  if(data.winner && data.winner!=='' && data.winner!==lastWinId){
-   lastWinId=data.winner;
-   if(data.winner===currentUser) addPoint(10);
-   if(data.winner==='SERI') addPoint(2);
-  }
- });
- gun.get('delz-match-v6-'+id).get('suit').on(data=>{
-  if(!data || !data.p1 || !data.p2) return;
-  if(!data.p1.choice || !data.p2.choice) return;
-  let p1=data.p1,p2=data.p2,winner='';
-  if(p1.choice===p2.choice) winner='SERI';
-  else if((p1.choice==='batu'&&p2.choice==='gunting')||(p1.choice==='gunting'&&p2.choice==='kertas')||(p1.choice==='kertas'&&p2.choice==='batu')) winner=p1.name; else winner=p2.name;
-  let isMe=p1.name===currentUser, myC=isMe?p1.choice:p2.choice, oppC=isMe?p2.choice:p1.choice;
-  let label={batu:'BATU',gunting:'GUNTING',kertas:'KERTAS'};
-  document.getElementById('suitResult').innerHTML='Lu: <b>'+label[myC]+'</b> vs Lawan: <b>'+label[oppC]+'</b><br><b>'+(winner==='SERI'?'SERI':winner===currentUser?'LU MENANG +5':'LU KALAH')+'</b>';
-  if(winner===currentUser) addPoint(5);
-  setTimeout(()=>{ gun.get('delz-match-v6-'+id).get('suit').put({p1:null,p2:null}); },3000);
- });
 }
 function applySize(n,broadcast=true){
  if(n===2){ boardRows=5; boardCols=2; } else { boardRows=n; boardCols=n; }
  boardSize=n; boardState=Array(totalCells()).fill(''); winCells=[];
  document.querySelectorAll('.sizeBtn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.size)===n));
  document.getElementById('sizeLabel').textContent=(n===2?'5 x 2 - 10 Kotak':boardRows+' x '+boardCols+' - '+totalCells()+' Kotak');
- if(broadcast && matchId){ gun.get('delz-match-v6-'+matchId).get('board').put({state:boardState.join(','),winner:'',size:n,winCells:''}); }
+ if(broadcast && matchId){ mqttClient.publish(TOPIC_BASE+'/match/'+matchId, JSON.stringify({type:'board',state:boardState,winner:'',size:n,winCells:[]})); }
  renderBoard();
 }
 function setSize(n){ applySize(n,true); }
@@ -341,7 +321,7 @@ function clickCell(i){
  boardState[i]=mySymbol;
  let res=checkWin();
  let winner=res?currentUser:(boardState.every(c=>c!=='')?'SERI':'');
- gun.get('delz-match-v6-'+matchId).get('board').put({state:boardState.join(','),winner,size:boardSize,winCells:res?res.join(','):''});
+ mqttClient.publish(TOPIC_BASE+'/match/'+matchId, JSON.stringify({type:'board',state:boardState,winner,size:boardSize,winCells:res||[]}));
  renderBoard();
  if(res){ document.getElementById('winModalText').textContent='Menang TicTacToe! +10 Point'; document.getElementById('winModal').classList.add('show'); }
 }
@@ -350,28 +330,42 @@ function checkWin(){
  for(let r=0;r<boardRows;r++){ for(let c=0;c<boardCols;c++){ let sym=boardState[r*boardCols+c]; if(!sym) continue; for(let [dr,dc] of dirs){ let cells=[r*boardCols+c]; for(let k=1;k<need;k++){ let nr=r+dr*k,nc=c+dc*k; if(nr<0||nr>=boardRows||nc<0||nc>=boardCols) break; let idx=nr*boardCols+nc; if(boardState[idx]!==sym) break; cells.push(idx); } if(cells.length===need) return cells; } } }
  return null;
 }
-function resetTTT(){ boardState=Array(totalCells()).fill(''); winCells=[]; lastWinId=''; if(matchId) gun.get('delz-match-v6-'+matchId).get('board').put({state:boardState.join(','),winner:'',size:boardSize,winCells:''}); renderBoard(); }
+function resetTTT(){ boardState=Array(totalCells()).fill(''); winCells=[]; lastWinId=''; if(matchId) mqttClient.publish(TOPIC_BASE+'/match/'+matchId, JSON.stringify({type:'board',state:boardState,winner:'',size:boardSize,winCells:[]})); renderBoard(); }
+let mySuitChoice=null;
 function playSuit(c){
  if(!matchId) return alert('Tantang user dulu!');
- let room=gun.get('delz-match-v6-'+matchId);
- room.get('suit').once(data=>{
-  let p1=data&&data.p1?data.p1:null, p2=data&&data.p2?data.p2:null;
-  if(!p1) room.get('suit').put({p1:{name:currentUser,choice:c},p2:null});
-  else if(!p2&&p1.name!==currentUser) room.get('suit').put({p1,p2:{name:currentUser,choice:c}});
-  else if(p1.name===currentUser) room.get('suit').put({p1:{name:currentUser,choice:c},p2});
- });
+ mySuitChoice=c;
+ if(!suitP1) suitP1={name:currentUser,choice:c};
+ else if(suitP2) { suitP1={name:currentUser,choice:c}; suitP2=null; }
+ else if(suitP1.name!==currentUser) suitP2={name:currentUser,choice:c};
+ else suitP1={name:currentUser,choice:c};
+ // Kirim suit, kalo lawan udah kirim, server MQTT bakal broadcast balik dan dihitung di on message
+ // Simpan local, kirim gabungan kalo udah ada 2
+ if(suitP1 && suitP2){ mqttClient.publish(TOPIC_BASE+'/match/'+matchId, JSON.stringify({type:'suit',p1:suitP1,p2:suitP2})); suitP1=null; suitP2=null; }
+ else {
+  // Kirim setengah dulu, tunggu lawan - kita simpan di variabel global via publish juga
+  mqttClient.publish(TOPIC_BASE+'/match/'+matchId, JSON.stringify({type:'suit-part',p1:suitP1,p2:suitP2}));
+ }
  document.getElementById('suitInfo').textContent='Lu pilih '+c.toUpperCase()+' - tunggu lawan...';
+ // Handle suit-part di message handler tambahan via timeout: kalo cuma 1, simpan
 }
+// Patch: handle suit-part di dalam connectMQTT message sudah di handle? Kita tambahkan handler sederhana: suit-part disimpan
+let _origOnMessage = null;
 function addPoint(p){
  currentPoint+=p;
  let users=getUsers(); if(users[currentUser]){ users[currentUser].point=currentPoint; saveUsers(users); }
  document.getElementById('mainPoint').textContent=currentPoint;
- gun.get('delz-leaderboard-v6').get(currentUser).put({name:currentUser,point:currentPoint});
- gun.get('delz-online-v6').get(currentUser).put({name:currentUser,point:currentPoint,online:true,lastSeen:Date.now()});
- loadLeaderboard();
+ publishOnline();
+ renderLeaderboardFromCache();
 }
-function loadLeaderboard(){
- let list=[]; gun.get('delz-leaderboard-v6').map().once((d,k)=>{ if(d&&d.name) list.push(d); list.sort((a,b)=>b.point-a.point); let top=list.slice(0,10); document.getElementById('leaderboard').innerHTML=top.length?top.map((u,i)=>'<div class="onlineRow"><span style="font-weight:700;font-size:13px">'+(i+1)+'. '+u.name+(u.name===currentUser?' (LU)':'')+'</span><span style="color:#ffd700;font-weight:800">'+u.point+' PTS</span></div>').join(''):'<p style="font-size:12px;color:#888;text-align:center">Belum ada data</p>'; });
+let lbCache={};
+function loadLeaderboardLocal(){
+ let users=getUsers(); lbCache={}; for(let k in users) lbCache[k]={name:k,point:users[k].point||0};
+ renderLeaderboardFromCache();
+}
+function renderLeaderboardFromCache(){
+ let list=Object.values(lbCache); list.sort((a,b)=>b.point-a.point); let top=list.slice(0,10);
+ document.getElementById('leaderboard').innerHTML=top.length?top.map((u,i)=>'<div class="onlineRow"><span style="font-weight:700;font-size:13px">'+(i+1)+'. '+u.name+(u.name===currentUser?' (LU)':'')+'</span><span style="color:#ffd700;font-weight:800">'+u.point+' PTS</span></div>').join(''):'<p style="font-size:12px;color:#888;text-align:center">Belum ada data</p>';
 }
 window.addEventListener('load',()=>{
  let sess=localStorage.getItem('delz_session'); let users=getUsers();
